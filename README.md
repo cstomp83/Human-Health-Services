@@ -25,6 +25,7 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255),
     email VARCHAR(100) NOT NULL UNIQUE
+    roles VARCHAR(12)
 );
 Note - this is a dummy database just to make sure we have the right configs so when we do make our database we know its connected
 8. Finally run this command python -m flask run

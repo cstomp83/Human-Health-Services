@@ -30,9 +30,16 @@ def login():
             session['loggedin'] = True
             session['id'] = account['user_id']
             session['username'] = account['username']
-            return render_template('index.html', msg='Logged in successfully!')
+            if account['roles'] == 'Patient':
+                return render_template('patient_view.html',msg='logged in succcessfully')
+            elif account['roles']=='Nurse':
+                return render_template('nurse_view.html',msg='logged in succcessfully')
+            elif account['roles']=='Physician':
+                return render_template('physician_view.html',msg='logged in succcessfully')
+            elif account['roles']=='Admin':
+                return render_template('admin_view.html',msg='logged in succcessfully')
         else:
-            msg = 'Incorrect username/password!'
+            msg = 'Failed login!'
     return render_template('login.html', msg=msg)
 
 @app.route('/logout')
@@ -49,6 +56,7 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
+        roles = request.form['role']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
         account = cursor.fetchone()
@@ -61,7 +69,7 @@ def register():
         elif not username or not password or not email:
             msg = 'Please fill out the form!'
         else:
-            cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s)', (username, email, password))
+            cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s)', (username, email, password,roles))
             mysql.connection.commit()
             msg = 'You have successfully registered!'
     return render_template('register.html', msg=msg)
