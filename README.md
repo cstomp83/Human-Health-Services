@@ -1,6 +1,7 @@
 **Introduction**
 hi team! this is just some starter code for our website it uses flask. I am currently on vs code and windows
-so if you are using that this should help you get started. 
+so if you are using that this should help you get started.
+ 
 **Getting Started**
 ok so once you have pulled this code you are going to want to set up your virtual enviroment.
 this tutorial should help - https://code.visualstudio.com/docs/python/tutorial-flask (this is for VS code)
