@@ -1,64 +1,33 @@
-Example plain HTML site using GitLab Pages.
+**Introduction**
+hi team! this is just some starter code for our website it uses flask. I am currently on vs code and windows
+so if you are using that this should help you get started. 
+**Getting Started**
+ok so once you have pulled this code you are going to want to set up your virtual enviroment.
+this tutorial should help - https://code.visualstudio.com/docs/python/tutorial-flask (this is for VS code)
+if you are on another IDE I don't know. but esseitnally you are going to want to do
+1. View > Command Palette or (Ctrl+Shift+P). Then select the Python: Create Environment command to create a virtual environment in your workspace. Select venv and then the Python environment you want to use to create it.
+2. open your command prompt (Ctrl+Shift+`)
+3. run this command .venv/bin/activate (run this if you are using powershell).venv\Scripts\Activate.ps1
+4. Next run this command pip install -r requirements.txt
+5. Set up your .env file and add these lines of code
+SECRET_KEY='your key'
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD='MySQL password'
+MYSQL_DB='DBProject'
+6. Open your MySQL workbench and go to Server> startup/shutdown> (make sure your server says running)
+7. run the following queries: 
+CREATE DATABASE DBProject;
+use DBProject;
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255),
+    email VARCHAR(100) NOT NULL UNIQUE
+);
+Note - this is a dummy database just to make sure we have the right configs so when we do make our database we know its connected
+8. Finally run this command python -m flask run
+9. this should pop up just a login in screen with regersitering new accounts and if you register an account should see it pop up in your db (select * from users;) -query to see it
 
-Learn more about GitLab Pages at https://pages.gitlab.io and the official
-documentation https://docs.gitlab.com/ce/user/project/pages/.
-
----
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
-
-- [GitLab CI](#gitlab-ci)
-- [GitLab User or Group Pages](#gitlab-user-or-group-pages)
-- [Did you fork this project?](#did-you-fork-this-project)
-- [Troubleshooting](#troubleshooting)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## GitLab CI
-
-This project's static Pages are built by [GitLab CI][ci], following the steps
-defined in [`.gitlab-ci.yml`](.gitlab-ci.yml):
-
-```
-image: busybox
-
-pages:
-  stage: deploy
-  script:
-  - echo 'Nothing to do...'
-  artifacts:
-    paths:
-    - public
-    expire_in: 1 day
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-```
-
-The above example expects to put all your HTML files in the `public/` directory.
-
-## GitLab User or Group Pages
-
-To use this project as your user/group website, you will need one additional
-step: just rename your project to `namespace.gitlab.io`, where `namespace` is
-your `username` or `groupname`. This can be done by navigating to your
-project's **Settings**.
-
-Read more about [user/group Pages][userpages] and [project Pages][projpages].
-
-## Did you fork this project?
-
-If you forked this project for your own use, please go to your project's
-**Settings** and remove the forking relationship, which won't be necessary
-unless you want to contribute back to the upstream project.
-
-## Troubleshooting
-
-1. CSS is missing! That means that you have wrongly set up the CSS URL in your
-   HTML files. Have a look at the [index.html] for an example.
-
-[ci]: https://about.gitlab.com/gitlab-ci/
-[index.html]: https://gitlab.com/pages/plain-html/blob/master/public/index.html
-[userpages]: https://docs.gitlab.com/ce/user/project/pages/introduction.html#user-or-group-pages
-[projpages]: https://docs.gitlab.com/ce/user/project/pages/introduction.html#project-pages
+**Notes** 
+Overall this is a starter dummy db once we get further into the project I will change this readme
