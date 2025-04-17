@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='site.css')}}" />
+    </head>
+
+    <body>
+        <h1 class="word">Welcome, Patient {{ session.username }}! </h1>
+        <div class="navbar">
+            <a href="{{url_for('patient')}}" class="navbar-brand">Home</a> 
+            <a href="{{ url_for('after_visit_summary') }}" class="navbar-item">After Visit Summaries</a>
+            <a href="{{ url_for('profile') }}" class="navbar-item">Profile</a>
+        </div>
+
+        <div class="body-content">
+            <footer>
+                <p class="word"></p>
+            </footer>
+        </div>
+    </body>
+</html>

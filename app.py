@@ -4,6 +4,7 @@ import MySQLdb.cursors
 import re
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -31,13 +32,13 @@ def login():
             session['id'] = account['user_id']
             session['username'] = account['username']
             if account['roles'] == 'Patient':
-                return render_template('patient_view.html',msg='logged in succcessfully')
+                return render_template('patient_views/patient_view.html', msg='logged in successfully')
             elif account['roles']=='Nurse':
-                return render_template('nurse_view.html',msg='logged in succcessfully')
+                return render_template('nurse_views/nurse_view.html',msg='logged in succcessfully')
             elif account['roles']=='Physician':
-                return render_template('physician_view.html',msg='logged in succcessfully')
+                return render_template('physician_view/physician_view.html',msg='logged in succcessfully')
             elif account['roles']=='Admin':
-                return render_template('admin_view.html',msg='logged in succcessfully')
+                return render_template('admin_views/admin_view.html',msg='logged in succcessfully')
         else:
             msg = 'Failed login!'
     return render_template('login.html', msg=msg)
@@ -73,6 +74,19 @@ def register():
             mysql.connection.commit()
             msg = 'You have successfully registered!'
     return render_template('register.html', msg=msg)
+
+@app.route('/profile')
+def profile():
+    return render_template('user_profile.html')
+    
+@app.route('/after_visit_summary')
+def after_visit_summary():
+    return render_template('patient_views/after_visit_summary.html')
+
+@app.route('/patient')
+def patient():
+    return render_template('patient_views/patient_view.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
