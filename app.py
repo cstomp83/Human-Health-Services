@@ -25,19 +25,20 @@ def login():
         username = request.form['username']
         password = request.form['password']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM users WHERE username = %s AND password = %s', (username, password))
+        cursor.execute('SELECT * FROM usernames WHERE username = %s AND passwordHash = %s', (username, password))
         account = cursor.fetchone()
         if account:
             session['loggedin'] = True
-            session['id'] = account['user_id']
-            session['username'] = account['username']
-            if account['roles'] == 'Patient':
+            session['id'] = account['UserID']
+            session['username'] = account['UserName']
+            roleID = account['UserTypeID']
+            if roleID == 2:
                 return render_template('patient_views/patient_view.html', msg='logged in successfully')
-            elif account['roles']=='Nurse':
+            elif roleID == 1:
                 return render_template('nurse_views/nurse_view.html',msg='logged in succcessfully')
-            elif account['roles']=='Physician':
-                return render_template('physician_view/physician_view.html',msg='logged in succcessfully')
-            elif account['roles']=='Admin':
+            elif roleID == 3:
+                return render_template('physician_views/physician_view.html',msg='logged in succcessfully')
+            elif roleID == 4:
                 return render_template('admin_views/admin_view.html',msg='logged in succcessfully')
         else:
             msg = 'Failed login!'
@@ -58,9 +59,12 @@ def register():
         password = request.form['password']
         email = request.form['email']
         roles = request.form['role']
+        SSN = request.form['SSN']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
+        cursor.execute('SELECT UserName, UserTypeID, PasswordHash, email, UserID from usernames WHERE UserName = %s', (username,))
         account = cursor.fetchone()
+        cursor.execute('SELECT * FROM Users WHERE SSN = %s',(SSN,))
+        user = cursor.fetchone()
         if account:
             msg = 'Account already exists!'
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
@@ -69,10 +73,17 @@ def register():
             msg = 'Username must contain only letters and numbers!'
         elif not username or not password or not email:
             msg = 'Please fill out the form!'
-        else:
-            cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s)', (username, email, password,roles))
+        if user:
+            userID = user['UserID']
+            cursor.execute('SELECT UserTypeID FROM UserTypes WHERE UserTypeDesc = %s', (roles,))
+            roleType = cursor.fetchone()
+            userTypeID = roleType['UserTypeID']
+            cursor.execute('INSERT INTO usernames (UserName,UserID,UserTypeID,PasswordHash, email) VALUES (%s,%s,%s,%s,%s)', (username, userID,userTypeID,password,email))
             mysql.connection.commit()
+
             msg = 'You have successfully registered!'
+         
+
     return render_template('register.html', msg=msg)
 
 @app.route('/profile')
