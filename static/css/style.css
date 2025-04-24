@@ -40,12 +40,31 @@ input[type="text"], input[type="password"], input[type="email"] {
     font-style: oblique;
 }
 
+option [type="text"], input[type="password"], input[type="email"] {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    background-color: #F0F8FF;
+    text-align: center;
+    font-weight: bold;
+    font-style: oblique;
+}
+
+
 /* Placeholder text styling */
 ::placeholder {
     color: #236B8E;
     font-weight: bold;
     font-style: oblique;
 }
+label {
+    color: #236B8E;
+    font-weight: bold;
+    font-style: oblique;
+}
+/* Select dropdown styling */   
 
 /* Button styling */
 button {

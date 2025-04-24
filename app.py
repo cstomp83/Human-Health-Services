@@ -80,10 +80,9 @@ def register():
             userTypeID = roleType['UserTypeID']
             cursor.execute('INSERT INTO usernames (UserName,UserID,UserTypeID,PasswordHash, email) VALUES (%s,%s,%s,%s,%s)', (username, userID,userTypeID,password,email))
             mysql.connection.commit()
-
             msg = 'You have successfully registered!'
-         
-
+        else:
+            return redirect(url_for('new_user_view'))
     return render_template('register.html', msg=msg)
 
 @app.route('/profile')
@@ -94,10 +93,67 @@ def profile():
 def after_visit_summary():
     return render_template('patient_views/after_visit_summary.html')
 
-@app.route('/patient')
-def patient():
-    return render_template('patient_views/patient_view.html')
+@app.route('/new_user_view', methods=['GET', 'POST'])
+def new_user_view():
+    msg = ''
+    if request.method == 'POST' and 'SSN' in request.form and 'firstName' in request.form and 'lastName' in request.form and 'email' in request.form:
+        # Get form data
+        username = request.form.get('username')
+        password = request.form.get('password')
+        email = request.form.get('email')
+        ssn = request.form.get('SSN')
+        address = request.form.get('address')
+        city = request.form.get('city')
+        state = request.form.get('state')
+        zip_code = request.form.get('zip')
+        dob = request.form.get('dob')
+        phone = request.form.get('phone')
+        first_name = request.form.get('firstName')
+        last_name = request.form.get('lastName')
+        middle_name = request.form.get('middleName')
+        role = request.form.get('role')
+        
+        # Get security questions and answers
+        security_questions = []
+        for i in range(1, 4):
+            question = request.form.get(f'security-question-{i}')
+            answer = request.form.get(f'security-answer-{i}')
+            security_questions.append((question, answer))
+        security_question_1, security_answer_1 = security_questions[0]
+        security_question_2, security_answer_2 = security_questions[1]
+        security_question_3, security_answer_3 = security_questions[2]
+        
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT UserName from usernames WHERE UserName = %s', (username,))
+        account = cursor.fetchone()
+        cursor.execute('SELECT * FROM Users WHERE SSN = %s',(ssn,))
+        user = cursor.fetchone()
+        if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Invalid email address!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only letters and numbers!'
+        if account or user:
+            msg = 'Account already exists!'
+        else:
+            cursor.execute('INSERT INTO Users (SSN, FirstName, LastName,' \
+            ' MiddleName, Address1, City, State, Zip, DOB, Phone) VALUES '
+            '(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', 
+            (ssn, first_name, last_name, middle_name, address, city, state, zip_code, dob, phone))
+            mysql.connection.commit()
+            cursor.execute('SELECT UserID FROM Users WHERE SSN = %s', (ssn,))
+            userID = cursor.fetchone()['UserID']
+            cursor.execute('SELECT UserTypeID FROM UserTypes WHERE UserTypeDesc = %s', (role,))
+            roleType = cursor.fetchone()
+            userTypeID = roleType['UserTypeID']
+            cursor.execute('INSERT INTO usernames (UserName,UserID,UserTypeID,PasswordHash,email,' \
+            'secuirtyQuestion1,secuirtyQuestion2,secuirtyQuestion3,' \
+            'securityAnswer1,securityAnswer2,securityAnswer3) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (username,userID,userTypeID,password,email,security_question_1,security_question_2,security_question_3,security_answer_1,security_answer_2,security_answer_3))  
+            mysql.connection.commit()
+            msg = 'You have successfully registered!'
+            # Insert security questions and answers into the database  
 
+        return render_template('login.html', msg=msg)
+    return render_template('new_user_view.html', msg=msg)
 
 if __name__ == '__main__':
     app.run(debug=True)

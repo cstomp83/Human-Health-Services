@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/register-grid.css') }}">
+    <title>Register</title>
+</head>
+<body>
+        <form action="{{ url_for('new_user_view') }}" method="post" class="form-grid">
+            <div>Welcome to the system! Please register as a user first.</div>
+            <input class="textbox" type="text" name="username" placeholder="Enter Username" required>
+            <input class="textbox" type="password" name="password" placeholder="Enter Password" required>
+            <input class="textbox" type="email" name="email" placeholder="Enter Email" required>
+            <input class="textbox" type="text" name="SSN" placeholder="Enter SSN" required>
+            <input class="textbox" type="text" name="address" placeholder="Enter Address" required>
+            <input class="textbox" type="text" name="city" placeholder="Enter City" required>
+            <input class="textbox" type="text" name="state" placeholder="Enter State" required>
+            <input class="textbox" type="text" name="zip" placeholder="Enter Zip Code" required>
+            <input class="textbox" type="date" name="dob" placeholder="Enter Date of Birth (YYYY-MM-DD)" required>
+            <input class="textbox" type="text" name="phone" placeholder="Enter Phone Number" required>
+            <input class="textbox" type="text" name="firstName" placeholder="Enter Your First Name" required>
+            <input class="textbox" type="text" name="lastName" placeholder="Enter Your Last Name" required>
+            <input class="textbox" type="text" name="middleName" placeholder="Enter Your Middle Name">
+        
+            <div>
+                <label for="role"> Choose a role </label>
+                <select id="role" name="role" required>
+                    <option value="Nurse">Nurse</option>
+                    <option value="Patient">Patient</option>
+                    <option value="Physician">Physician</option>
+                    <option value="Admin">Admin</option>
+            </select>
+            </div>
+            <div id="security-questions-container"></div>
+            <button class="btn" type="submit">Register</button>
+        </form>
+
+        <script src="{{ url_for('static', filename='js/security_question.js') }}"></script>
+</body>
+</html>
