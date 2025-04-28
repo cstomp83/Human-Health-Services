@@ -33,13 +33,13 @@ def login():
             session['username'] = account['UserName']
             roleID = account['UserTypeID']
             if roleID == 2:
-                return render_template('patient_views/patient_view.html', msg='logged in successfully')
+                return redirect(url_for('patient'))
             elif roleID == 1:
-                return render_template('nurse_views/nurse_view.html',msg='logged in succcessfully')
+                return redirect(url_for('nurse'))
             elif roleID == 3:
-                return render_template('physician_views/physician_view.html',msg='logged in succcessfully')
+                return redirect(url_for('physician'))
             elif roleID == 4:
-                return render_template('admin_views/admin_view.html',msg='logged in succcessfully')
+                return redirect(url_for('admin'))
         else:
             msg = 'Failed login!'
     return render_template('login.html', msg=msg)
@@ -156,19 +156,28 @@ def new_user_view():
 
 @app.route('/patient')
 def patient():
-    return render_template('patient_views/patient_view.html')
+    if 'loggedin' in session:
+        return render_template('patient_views/patient_view.html')
+    return redirect(url_for('login'))
+
 
 @app.route('/nurse')
 def nurse():
-    return render_template('nurse_views/nurse_view.html')
+    if 'loggedin' in session:
+        return render_template('nurse_views/nurse_view.html')
+    return redirect(url_for('login'))
 
 @app.route('/physician')
 def physician():
-    return render_template('physician_views/physician_view.html')
+    if 'loggedin' in session:
+        return render_template('physician_views/physician_view.html')
+    return redirect(url_for('login'))
 
 @app.route('/admin')
 def admin():
-    return render_template('admin_views/admin_view.html')
+    if 'loggedin' in session:
+        return render_template('admin_views/admin_view.html')
+    return redirect(url_for('login'))   
 
 @app.route('/user_profile')
 def user_profile():
