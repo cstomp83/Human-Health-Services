@@ -150,10 +150,29 @@ def new_user_view():
             'securityAnswer1,securityAnswer2,securityAnswer3) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (username,userID,userTypeID,password,email,security_question_1,security_question_2,security_question_3,security_answer_1,security_answer_2,security_answer_3))  
             mysql.connection.commit()
             msg = 'You have successfully registered!'
-            # Insert security questions and answers into the database  
 
         return render_template('login.html', msg=msg)
     return render_template('new_user_view.html', msg=msg)
+
+@app.route('/patient')
+def patient():
+    return render_template('patient_views/patient_view.html')
+
+@app.route('/nurse')
+def nurse():
+    return render_template('nurse_views/nurse_view.html')
+
+@app.route('/physician')
+def physician():
+    return render_template('physician_views/physician_view.html')
+
+@app.route('/admin')
+def admin():
+    return render_template('admin_views/admin_view.html')
+
+@app.route('/user_profile')
+def user_profile():
+    return render_template('user_profile.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
