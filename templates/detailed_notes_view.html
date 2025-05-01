@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>My Detail Notes</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css')}}" />
+</head>
+<body>
+    <h1 class="word">Welcome, {{ session['username'] }}!</h1>
+
+    <div class="navbar">
+        <a href="{{ url_for('profile') }}" class="navbar-item">Profile</a>
+        <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
+    </div>
+
+    <div class="body-content">
+        <h2>Your Detail Notes</h2>
+        <div id="notesContent">Loading notes...</div>
+    </div>
+
+    <footer>
+        <p class="word"></p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/detail_notes.js') }}"></script>
+    <script>
+        // Trigger fetch on page load
+        loadUserDetailNotes("{{ username }}");
+    </script>
+</body>
+</html>

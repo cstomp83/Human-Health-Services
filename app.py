@@ -4,6 +4,7 @@ import MySQLdb.cursors
 import re
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 load_dotenv()
 
@@ -40,6 +41,8 @@ def login():
                 return redirect(url_for('physician'))
             elif roleID == 4:
                 return redirect(url_for('admin'))
+            elif roleID == 5:
+                return redirect(url_for('staff'))
         else:
             msg = 'Failed login!'
     return render_template('login.html', msg=msg)
@@ -78,7 +81,7 @@ def register():
             cursor.execute('SELECT UserTypeID FROM UserTypes WHERE UserTypeDesc = %s', (roles,))
             roleType = cursor.fetchone()
             userTypeID = roleType['UserTypeID']
-            cursor.execute('INSERT INTO usernames (UserName,UserID,UserTypeID,PasswordHash, email) VALUES (%s,%s,%s,%s,%s)', (username, userID,userTypeID,password,email))
+            cursor.execute('CALL InsertIntoUsernames(%s, %s, %s, %s, %s)', (username, userID, userTypeID, password, email))
             mysql.connection.commit()
             msg = 'You have successfully registered!'
         else:
@@ -135,19 +138,15 @@ def new_user_view():
         if account or user:
             msg = 'Account already exists!'
         else:
-            cursor.execute('INSERT INTO Users (SSN, FirstName, LastName,' \
-            ' MiddleName, Address1, City, State, Zip, DOB, Phone) VALUES '
-            '(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', 
-            (ssn, first_name, last_name, middle_name, address, city, state, zip_code, dob, phone))
+            cursor.execute('CALL InsertIntoUsers(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                           (ssn, first_name, last_name, middle_name, address, city, state, zip_code, dob, phone))
             mysql.connection.commit()
             cursor.execute('SELECT UserID FROM Users WHERE SSN = %s', (ssn,))
             userID = cursor.fetchone()['UserID']
             cursor.execute('SELECT UserTypeID FROM UserTypes WHERE UserTypeDesc = %s', (role,))
             roleType = cursor.fetchone()
             userTypeID = roleType['UserTypeID']
-            cursor.execute('INSERT INTO usernames (UserName,UserID,UserTypeID,PasswordHash,email,' \
-            'secuirtyQuestion1,secuirtyQuestion2,secuirtyQuestion3,' \
-            'securityAnswer1,securityAnswer2,securityAnswer3) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (username,userID,userTypeID,password,email,security_question_1,security_question_2,security_question_3,security_answer_1,security_answer_2,security_answer_3))  
+            cursor.execute('CALL InsertIntoUsernames(%s, %s, %s, %s, %s)', (username, userID, userTypeID, password, email))
             mysql.connection.commit()
             msg = 'You have successfully registered!'
 
@@ -177,11 +176,91 @@ def physician():
 def admin():
     if 'loggedin' in session:
         return render_template('admin_views/admin_view.html')
+    return redirect(url_for('login'))
+
+@app.route('/staff')
+def staff():
+    if 'loggedin' in session:
+        return render_template('staff_views/staff_view.html')
     return redirect(url_for('login'))   
 
 @app.route('/user_profile')
 def user_profile():
     return render_template('user_profile.html')
+
+
+@app.route('/physician_patients')
+def physician_patients():
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('CALL GetPhysicianPatients(%s)', (session['username'],))
+        patients = cursor.fetchall()
+        return render_template('physician_views/physician_patients.html', patients=patients)
+    return redirect(url_for('login'))
+
+@app.route('/get_medical_records/<username>')
+def get_medical_records(username):
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('CALL GetFullMedicalRecords(%s)', (username,))
+        records = cursor.fetchall()
+
+        if not records:
+            return "No medical records found."
+
+        html = '<ul>'
+        for record in records:
+            date_obj = record.get('RecordDate')
+            formatted_date = date_obj.strftime('%m/%d/%Y') if isinstance(date_obj, datetime) else 'N/A'
+
+            html += f"""
+            <li>
+                <strong>Date:</strong> {formatted_date}<br>
+                <strong>Description:</strong> {record.get('RecordDesc', 'N/A')}<br>
+                <strong>Condition:</strong> {record.get('Conditions', 'N/A')}<br>
+                <strong>Allergy:</strong> {record.get('AllergyName', 'N/A')}<br>
+                <strong>Allergy Description:</strong> {record.get('AllergyDesc', 'N/A')}<br>
+                <strong>Medication:</strong> {record.get('MedicationName', 'N/A')}<br>
+                <strong>Strength:</strong> {record.get('MedicationStrength', 'N/A')}<br>
+                <strong>Dose:</strong> {record.get('Dose', 'N/A')}<br>
+                <strong>Dosage Frequency:</strong> {record.get('Dosage', 'N/A')}
+            </li><hr>
+            """
+        html += '</ul>'
+        return html
+    return "Unauthorized", 401
+
+@app.route('/user_detail_notes')
+def user_detail_notes():
+    if 'loggedin' in session:
+        return render_template('detailed_notes_view.html', username=session['username'])
+    return redirect(url_for('login'))
+
+@app.route('/api/user_detail_notes/<username>')
+def get_user_detail_notes(username):
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('CALL GetUserDetailNotes(%s)', (username,))
+        notes = cursor.fetchall()
+
+        if not notes:
+            return "No detail notes found."
+
+        html = "<ul>"
+        for note in notes:
+            date = note.get('DateTimeCreated')
+            formatted_date = date.strftime('%m/%d/%Y %H:%M') if date else 'N/A'
+            html += f"""
+                <li>
+                    <strong>Date:</strong> {formatted_date}<br>
+                    <strong>Patient:</strong> {note.get('PatientUserName', 'N/A')}<br>
+                    <strong>Note:</strong> {note.get('NotesDesc', 'N/A')}
+                </li><hr>
+            """
+        html += "</ul>"
+        return html
+    return "Unauthorized", 401
+
 
 if __name__ == '__main__':
     app.run(debug=True)
