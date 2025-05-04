@@ -90,7 +90,34 @@ def register():
 
 @app.route('/profile')
 def profile():
-    return render_template('user_profile.html')
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM Users WHERE UserName = %s', (session['username'],))
+        user_info = cursor.fetchone()
+        cursor.execute('SELECT UserTypeID FROM Usernames WHERE UserName = %s', (session['username'],))
+        user_type = cursor.fetchone()
+        if user_type['UserTypeID'] == 1:
+            cursor.execute('SELECT * FROM nurses WHERE nurseusername=%s', (session['username'],))
+            nurse_info = cursor.fetchone()
+            render_template('nurse_profile_view.html', user_info=user_info, nurse_info=nurse_info)
+        elif user_type['UserTypeID'] == 2:
+            cursor.execute('SELECT * FROM patients WHERE PatientSUserName=%s', (session['username'],))
+            patient_info = cursor.fetchone()
+            render_template('patient_profile_view.html', user_info=user_info, patient_info=patient_info)
+        elif user_type['UserTypeID'] == 3:
+            cursor.execute('SELECT * FROM physicians WHERE PhysicianUserName=%s', (session['username'],))
+            physician_info = cursor.fetchone()
+            render_template('physician_view.html', user_info=user_info, physician_info=physician_info)
+        elif user_type['UserTypeID'] == 4:
+            cursor.execute('SELECT * FROM admins WHERE AdminUserName=%s', (session['username'],))
+            admin_info = cursor.fetchone()
+            render_template('admin_profile_view.html', user_info=user_info, admin_info=admin_info)
+        elif user_type['UserTypeID'] == 5:
+            cursor.execute('SELECT * FROM staff WHERE StaffUserName=%s', (session['username'],))
+            staff_info = cursor.fetchone()
+            render_template('staff_view.html', user_info=user_info, staff_info=staff_info)
+    return redirect(url_for('login'))
+
     
 @app.route('/after_visit_summary')
 def after_visit_summary():
@@ -156,8 +183,101 @@ def new_user_view():
 @app.route('/patient')
 def patient():
     if 'loggedin' in session:
-        return render_template('patient_views/patient_view.html')
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('CALL GetPatientInsuranceInfo(%s)', (session['username'],))
+        insurance = cursor.fetchone()
+        return render_template('patient_views/patient_view.html', insurance=insurance)
     return redirect(url_for('login'))
+
+@app.route('/edit_insurance', methods=['GET', 'POST'])
+def edit_insurance():
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        # Get all available insurances
+        cursor.execute('SELECT InsuranceID, ProviderName FROM Insurance')
+        insurance_list = cursor.fetchall()
+
+        if request.method == 'POST':
+            new_insurance_id = request.form.get('insurance_id')
+            # Update the patient's insurance ID
+            cursor.execute(
+                'UPDATE Patients SET InsuranceID = %s WHERE PatientUserName = %s',
+                (new_insurance_id, session['username'])
+            )
+            mysql.connection.commit()
+            return redirect(url_for('patient'))
+
+        return render_template('patient_views/edit_insurance.html', insurance_list=insurance_list)
+    return redirect(url_for('login'))
+
+@app.route('/schedule_appointment', methods=['GET', 'POST'])
+def schedule_appointment():
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
+
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    if request.method == 'POST':
+        appt_type_id = request.form['appt_type_id']
+        clinic_id = request.form['clinic_id']
+        date = request.form['date']
+        start_time = request.form['start_time']
+        end_time = request.form['end_time']
+        physician_username = request.form['physician_username']
+        schedule_type_id = request.form['schedule_type_id']
+
+        cursor.execute('SELECT PhysicianCalenderID FROM PhysicianCalenders WHERE PhysicianUserName = %s', (physician_username,))
+        row = cursor.fetchone()
+        if not row:
+            return "Error: No calendar entry found for physician", 400
+        
+        physician_calendar_id = row['PhysicianCalenderID']
+        # Insert the new appointment
+        cursor.execute('''
+            INSERT INTO PhysicianAppts (PhysicianCalenderID, PatientUserName, Date, StartTime, EndTime, ApptTypeID, ClinicID, ScheduleTypeID)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        ''', (physician_calendar_id, session['username'], date, start_time, end_time, appt_type_id, clinic_id, schedule_type_id))
+        mysql.connection.commit()
+
+        return redirect(url_for('patient'))  # or wherever you want to send them after
+    cursor.execute('CALL GetFutureAppointmentsByPatient(%s);', (session['username'],))
+    appointments = cursor.fetchall()
+
+    # Fetch form options
+    cursor.execute('SELECT ApptTypeID, ApptTypeDesc FROM ApptTypes')
+    appt_types = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM ScheduleTypes')
+    schedule_types = cursor.fetchall()
+
+    cursor.execute('SELECT ClinicID, ClinicName FROM Clinics')
+    clinics = cursor.fetchall()
+
+    cursor.execute('SELECT PhysicianUserName FROM Physicians')
+    physicians = cursor.fetchall()
+
+    return render_template('patient_views/schedule_appointment.html', appt_types=appt_types, schedule_types=schedule_types, clinics=clinics, physicians=physicians,appointments=appointments)
+
+
+
+@app.route('/patient_views/patient_billing')
+def patient_billing():
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('CALL GetPatientBilling(%s)', (session['username'],))
+        billing_info = cursor.fetchall()
+        return render_template('patient_views/patient_billing.html', billing_info=billing_info)
+    return redirect(url_for('login'))
+
+@app.route('/pay_bill', methods=['POST'])
+def pay_bill():
+    if 'loggedin' in session and 'billing_id' in request.form:
+        billing_id = request.form['billing_id']
+        cursor = mysql.connection.cursor()
+        cursor.execute('DELETE FROM Billing WHERE BillingID = %s AND PatientUserName = %s', (billing_id, session['username']))
+        mysql.connection.commit()
+    return redirect(url_for('patient_billing'))
 
 
 @app.route('/nurse')
@@ -260,6 +380,28 @@ def get_user_detail_notes(username):
         html += "</ul>"
         return html
     return "Unauthorized", 401
+
+@app.route('/physician_lab_test_orders', methods=['GET', 'POST'])
+def physician_lab_test_orders():
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('CALL GetPhysicianPatients(%s)', (session['username'],))
+        patients = cursor.fetchall()
+
+        if request.method == 'POST':
+            test_name = request.form['test_name']
+            test_type = request.form['test_type']
+            patient_username = request.form['patient_username']
+            physician_username = session['username']
+
+            cursor.execute(
+                'INSERT INTO LabTest (TestName, TestType, TestResult, PhysicianUserName, PatientUserName) VALUES (%s, %s, %s, %s, %s)',
+                (test_name, test_type, '', physician_username, patient_username)
+            )
+            mysql.connection.commit()
+
+        return render_template('physician_views/physician_lab_test_orders.html', patients=patients)
+    return redirect(url_for('login'))
 
 
 if __name__ == '__main__':

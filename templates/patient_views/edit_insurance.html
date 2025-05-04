@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Edit Insurance</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css') }}" />
+</head>
+<body>
+    <h2>Edit Your Insurance</h2>
+    <form method="POST">
+        <label for="insurance_id">Select New Insurance:</label>
+        <select name="insurance_id" required>
+            {% for option in insurance_list %}
+                <option value="{{ option.InsuranceID }}">{{ option.ProviderName }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <button type="submit">Update Insurance</button>
+    </form>
+    <br>
+    <a href="{{ url_for('patient') }}">Back to Dashboard</a>
+</body>
+</html>

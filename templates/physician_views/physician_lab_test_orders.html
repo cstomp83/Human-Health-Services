@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Lab Test Orders</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css')}}" />
+</head>
+<body>
+    <h1>Welcome, Physician {{ session.username }}!</h1>
+    <div class="navbar">
+        <a href="{{url_for('physician')}}" class="navbar-brand">Home</a> 
+        <a href="{{ url_for('physician_patients') }}" class="navbar-item">Patients</a>
+        <a href="{{ url_for('profile') }}" class="navbar-item">Profile</a>
+        <a href="{{ url_for('physician_lab_test_orders') }}" class="navbar-item">Lab Test Orders</a>
+        <a href="{{ url_for('user_detail_notes') }}" class="navbar-item">Detailed Notes</a>
+        <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
+    </div>
+    <h2>Order a Lab Test</h2>
+    <form method="POST">
+        <label for="patient_username">Select Patient:</label>
+        <select name="patient_username" required>
+            {% for patient in patients %}
+                <option value="{{ patient.UserName }}">{{ patient.UserName }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="test_name">Test Name:</label>
+        <input type="text" name="test_name" required><br><br>
+
+        <label for="test_type">Test Type:</label>
+        <input type="text" name="test_type" required><br><br>
+
+        <input type="submit" value="Order Lab Test">
+    </form>
+</body>
+</html>

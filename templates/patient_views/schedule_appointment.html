@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schedule Appointment</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css') }}" />
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h1 class="word">Welcome, Patient {{ session.username }}! </h1>
+        <div class="navbar">
+            <a href="{{url_for('patient')}}" class="navbar-brand">Home</a> 
+            <a href="{{ url_for('after_visit_summary') }}" class="navbar-item">After Visit Summaries</a>
+            <a href="{{ url_for('user_profile') }}" class="navbar-item">Profile</a>
+            <a href="{{ url_for('patient_billing') }}" class="navbar-item">Billing</a>
+            <a href="{{ url_for('schedule_appointment') }}" class="navbar-item">Schedule Appointment</a>
+        </div>
+    <br><br>
+    <h2>Upcoming Appointments</h2>
+    <table border="1" class="table table-striped">
+        <tr>
+            <th>Clinic Name</th>
+            <th>Address</th>
+            <th>Physician Name</th>
+            <th>Appointment Type</th>
+            <th>Date</th>
+            <th>Start Time</th>
+        </tr>
+        {% for appointment in appointments %}
+        <tr>
+            <td>{{ appointment.ClinicName }}</td>
+            <td>{{ appointment.Address1 }}</td>
+            <td>{{ appointment.PhysicianUserName }}</td>
+            <td>{{ appointment.ApptTypeDesc}}</td>
+            <td>{{ appointment.Date }}</td>
+            <td>{{ appointment.StartTime }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br><br>
+    <h3>Schedule an Appointment</h3>
+    <form method="POST">
+        <label for="schedule_type_id">Schedule Type:</label>
+        <select name="schedule_type_id" required>
+            {% for s in schedule_types %}
+                <option value="{{ s.ScheduleTypeID }}">{{ s.ScheduleTypeDesc }}</option>
+            {% endfor %}
+        </select><br><br>
+        <label for="appt_type_id">Appointment Type:</label>
+        <select name="appt_type_id" required>
+            {% for type in appt_types %}
+                <option value="{{ type.ApptTypeID }}">{{ type.ApptTypeDesc }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="clinic_id">Select Clinic:</label>
+        <select name="clinic_id" required>
+            {% for clinic in clinics %}
+                <option value="{{ clinic.ClinicID }}">{{ clinic.ClinicName }}</option>
+            {% endfor %}
+        </select><br><br>
+        <label for="physician_username">Select Physician:</label>
+        <select name="physician_username" required>
+            {% for physician in physicians %}
+                <option value="{{ physician.PhysicianUserName }}">{{ physician.PhysicianUserName }}</option>
+            {% endfor %}
+        </select><br><br>
+        <label for="date">Date:</label>
+        <input type="date" name="date" required><br><br>
+
+        <label for="start_time">Start Time:</label>
+        <input type="time" name="start_time" required><br><br>
+
+        <label for="end_time">End Time:</label>
+        <input type="time" name="end_time" required><br><br>
+
+        <button type="submit">Schedule Appointment</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('patient') }}">Back to Dashboard</a>
+</body>
+</html>

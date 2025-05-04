@@ -6,12 +6,10 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css')}}" />
     </head>
     <body>
-        <h1 class="word">Welcome, Physician {{ session.username }}! </h1>
+        <h1 class="word">Welcome, Nurse {{ session.username }}! </h1>
         <div class="navbar">
-            <a href="{{url_for('physician')}}" class="navbar-brand">Home</a> 
-            <a href="{{ url_for('physician_patients') }}" class="navbar-item">Patients</a>
+            <a href="{{url_for('nurse')}}" class="navbar-brand">Home</a> 
             <a href="{{ url_for('profile') }}" class="navbar-item">Profile</a>
-            <a href="{{ url_for('physician_lab_test_orders') }}" class="navbar-item">Lab Test Orders</a>
             <a href="{{ url_for('user_detail_notes') }}" class="navbar-item">Detailed Notes</a>
             <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
         </div>
