@@ -8,11 +8,12 @@
 <body>
     <h1 class="word">Welcome, Patient {{ session.username }}! </h1>
     <div class="navbar">
-        <a href="{{ url_for('patient') }}" class="navbar-brand">Home</a> 
+        <a href="{{url_for('patient')}}" class="navbar-brand">Home</a> 
         <a href="{{ url_for('after_visit_summary') }}" class="navbar-item">After Visit Summaries</a>
         <a href="{{ url_for('user_profile') }}" class="navbar-item">Profile</a>
         <a href="{{ url_for('patient_billing') }}" class="navbar-item">Billing</a>
         <a href="{{ url_for('schedule_appointment') }}" class="navbar-item">Schedule Appointment</a>
+        <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
     </div>
 
     <div class="body-content">

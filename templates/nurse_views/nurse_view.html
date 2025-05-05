@@ -13,6 +13,33 @@
             <a href="{{ url_for('user_detail_notes') }}" class="navbar-item">Detailed Notes</a>
             <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
         </div>
+        <h2 class="word">Detailed notes to finish</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Detail Note ID</th>
+                    <th>Patient</th>
+                    <th>Physician </th>
+                    <th>Staff</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for note in notes %}
+                <tr>
+                    <td>{{ note.DetailNoteID}}</td>
+                    <td>{{ note.PatientUserName }}</td>
+                    <td>{{ note.PhysicianUserName }}</td>
+                    <td>{{ note.StaffUserName }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('update_notes') }}">
+                            <input type="hidden" name="detail_note_id" value="{{ note.DetailNoteID }}">
+                            <input type="text" name="note_desc" placeholder="Enter note text">
+                            <button type="submit">Submit</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
         <div class="body-content">
             <footer>
                 <p class="word"></p>

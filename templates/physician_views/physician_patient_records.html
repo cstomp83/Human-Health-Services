@@ -17,22 +17,30 @@
         <a href="{{ url_for('physician_patient_records') }}" class="navbar-item">Medical Records</a>
         <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
     </div>
-    <h2>Order a Lab Test</h2>
-    <form method="POST">
-        <label for="patient_username">Select Patient:</label>
-        <select name="patient_username" required>
-            {% for patient in patients %}
-                <option value="{{ patient.UserName }}">{{ patient.UserName }}</option>
+    <h2>Empty Records</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Conditions</th>
+                <th>Record Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mr in medical_records %}
+            <tr>
+                <td>{{ mr.PatientUserName }}</td>
+                <td colspan="2">
+                    <form method="POST" action="{{ url_for('update_medical_record') }}">
+                        <input type="hidden" name="record_id" value="{{ mr.PatientMedicalRecordsID }}">
+                        <input type="text" name="condition_desc" placeholder="Enter condition">
+                        <input type="text" name="record_desc" placeholder="Enter record description">
+                        <button type="submit">Submit</button>
+                    </form>
+                </td>
+            </tr>
             {% endfor %}
-        </select><br><br>
-
-        <label for="test_name">Test Name:</label>
-        <input type="text" name="test_name" required><br><br>
-
-        <label for="test_type">Test Type:</label>
-        <input type="text" name="test_type" required><br><br>
-
-        <input type="submit" value="Order Lab Test">
-    </form>
+        </tbody>
+    </table>
 </body>
 </html>

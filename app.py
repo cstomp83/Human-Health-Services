@@ -121,6 +121,12 @@ def profile():
     
 @app.route('/after_visit_summary')
 def after_visit_summary():
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('Select * from AfterVisitSummary where PatientUserName = %s' \
+        ' Order By DateCreated DESC', (session['username'],))
+        visit_summary = cursor.fetchall()
+        return render_template('patient_views/after_visit_summary.html', visit_summary=visit_summary)
     return render_template('patient_views/after_visit_summary.html')
 
 @app.route('/new_user_view', methods=['GET', 'POST'])
@@ -283,14 +289,47 @@ def pay_bill():
 @app.route('/nurse')
 def nurse():
     if 'loggedin' in session:
-        return render_template('nurse_views/nurse_view.html')
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('Select * from detailnotes where NurseUserName = %s AND NotesDesc IS NUll', (session['username'],))
+        notes = cursor.fetchall()
+        return render_template('nurse_views/nurse_view.html', notes=notes)
     return redirect(url_for('login'))
+
+@app.route('/update_notes', methods=['POST'])
+def update_notes():
+    if 'loggedin' in session and 'detail_note_id' in request.form and 'note_desc' in request.form:
+        notes_id = request.form['detail_note_id']
+        notes_desc = request.form['note_desc']
+        cursor = mysql.connection.cursor()
+        cursor.execute('UPDATE detailNotes SET NotesDesc = %s WHERE DetailNoteID = %s', (notes_desc, notes_id))
+        mysql.connection.commit()
+    return redirect(url_for('nurse'))
 
 @app.route('/physician')
 def physician():
     if 'loggedin' in session:
         return render_template('physician_views/physician_view.html')
     return redirect(url_for('login'))
+
+@app.route('/physician_patient_records')
+def physician_patient_records():
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('CALL GetUnfinishedMedicalRecords(%s)', (session['username'],))
+        medical_records = cursor.fetchall()
+        return render_template('physician_views/physician_patient_records.html', medical_records=medical_records)
+    return redirect(url_for('login'))
+
+@app.route('/update_medical_record', methods=['POST'])
+def update_medical_record():
+    if 'loggedin' in session and 'record_id' in request.form and 'record_desc' in request.form:
+        record_id = request.form['record_id']
+        record_desc = request.form['record_desc']
+        conditions = request.form['condition_desc']
+        cursor = mysql.connection.cursor()
+        cursor.execute('UPDATE PatientMedicalRecords SET RecordDesc = %s, Conditions = %s WHERE PatientMedicalRecordsID = %s',(record_desc, conditions, record_id))
+        mysql.connection.commit()
+    return redirect(url_for('physician_patient_records'))
 
 @app.route('/admin')
 def admin():
@@ -301,8 +340,36 @@ def admin():
 @app.route('/staff')
 def staff():
     if 'loggedin' in session:
-        return render_template('staff_views/staff_view.html')
-    return redirect(url_for('login'))   
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('CALL GetTodayAppointmentsByStaff(%s)', (session['username'],))
+        appointments = cursor.fetchall()
+        cursor.execute('SELECT ClinicID FROM Staff WHERE StaffUserName = %s', (session['username'],))
+        clinic = cursor.fetchone()['ClinicID']
+        cursor.execute('Select NurseUserName From nurses where clinicID = %s', (clinic,))
+        nurses = cursor.fetchall()
+        return render_template('staff_views/staff_view.html', appointments=appointments, nurses=nurses)
+    return redirect(url_for('login'))
+
+@app.route('/assign_nurse', methods=['POST'])
+def assign_nurse():
+    if 'loggedin' in session and 'nurse_username' in request.form and 'appointment_id' in request.form:
+        nurse_username = request.form['nurse_username']
+        appointment_id = request.form['appointment_id']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('UPDATE PhysicianAppts SET checkedIn = %s WHERE PhysicianApptID = %s', (True, appointment_id))
+        cursor.execute('Select * From PhysicianAppts where PhysicianApptID = %s', (appointment_id,))
+        appointment = cursor.fetchone()
+        clinic_id = appointment['ClinicID']
+        patient_username = appointment['PatientUserName']
+        physician_calendar_id = appointment['PhysicianCalenderID']
+        cursor.execute('Select PhysicianUserName From PhysicianCalenders where PhysicianCalenderID = %s', (physician_calendar_id,))
+        physician_username = cursor.fetchone()['PhysicianUserName']
+        staff_username = session['username']
+        cursor.execute('Insert into detailNotes (PatientUserName, NurseUserName,PhysicianUserName, StaffUserName,DateTimeCreated,ClinicID ) values (%s, %s, %s, %s, %s,%s)', 
+                       (patient_username, nurse_username,physician_username, staff_username, datetime.now(),clinic_id))
+        mysql.connection.commit()
+    return redirect(url_for('staff'))
+   
 
 @app.route('/user_profile')
 def user_profile():
@@ -393,10 +460,12 @@ def physician_lab_test_orders():
             test_type = request.form['test_type']
             patient_username = request.form['patient_username']
             physician_username = session['username']
-
+            cursor.execute('SELECT PatientMedicalRecordsID FROM ' \
+            'PatientMedicalRecords WHERE PatientUserName = %s AND RecordDesc IS NULL', (patient_username,))
+            patient_medical_record_id = cursor.fetchone()['PatientMedicalRecordsID']
             cursor.execute(
-                'INSERT INTO LabTest (TestName, TestType, TestResult, PhysicianUserName, PatientUserName) VALUES (%s, %s, %s, %s, %s)',
-                (test_name, test_type, '', physician_username, patient_username)
+                'INSERT INTO LabTest (TestName, TestType, TestResult, PhysicianUserName, PatientUserName, PatientMedicalRecordsID) VALUES (%s, %s, %s, %s, %s, %s)',
+                (test_name, test_type, '', physician_username, patient_username,patient_medical_record_id)
             )
             mysql.connection.commit()
 

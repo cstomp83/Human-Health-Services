@@ -13,6 +13,39 @@
             <a href="{{ url_for('user_detail_notes') }}" class="navbar-item">Detailed Notes</a>
             <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
         </div>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Physician</th>
+                        <th>Patient</th>
+                        <th>Appointment Time</th>
+                        <th>Appointment Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                    <tr>
+                        <td>{{ appointment.PhysicianUserName }}</td>
+                        <td>{{ appointment.PatientUserName }}</td>
+                        <td>{{ appointment.StartTime }}</td>
+                        <td>{{ appointment.ApptTypeDesc }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('assign_nurse') }}">
+                                <input type="hidden" name="patient_username" value="{{ appointment.PatientUserName }}">
+                                <input type="hidden" name="appointment_id" value="{{ appointment.PhysicianApptID }}">
+                                <select name="nurse_username">
+                                    {% for nurse in nurses %}
+                                        <option value="{{ nurse.NurseUserName }}">{{ nurse.NurseUserName }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit">Assign</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+        </div>
         <div class="body-content">
             <footer>
                 <p class="word"></p>
