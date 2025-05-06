@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Healthcare Appointment Scheduler</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label, select, input {
+      display: block;
+      margin-bottom: 15px;
+      width: 100%;
+    }
+    button {
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Schedule an Appointment</h2>
+  <form action="/schedule" method="POST">
+    <label for="physician">Select Physician:</label>
+    <select id="physician" name="physician" required>
+      <option value="">-- Choose --</option>
+      <option value="dr_smith">Dr. Smith</option>
+      <option value="dr_jones">Dr. Jones</option>
+      <option value="dr_lee">Dr. Lee</option>
+    </select>
+
+    <label for="date">Select Date:</label>
+    <input type="date" id="date" name="date" required>
+
+    <label for="time">Select Time:</label>
+    <input type="time" id="time" name="time" required>
+
+    <button type="submit">Book Appointment</button>
+  </form>
+</body>
+</html>

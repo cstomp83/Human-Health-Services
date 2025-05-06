@@ -92,14 +92,14 @@ def register():
 def profile():
     if 'loggedin' in session:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM Users WHERE UserName = %s', (session['username'],))
+        cursor.execute('SELECT * FROM usernames WHERE UserName = %s', (session['username'],))
         user_info = cursor.fetchone()
-        cursor.execute('SELECT UserTypeID FROM Usernames WHERE UserName = %s', (session['username'],))
+        cursor.execute('SELECT UserTypeID FROM usernames WHERE UserName = %s', (session['username'],))
         user_type = cursor.fetchone()
         if user_type['UserTypeID'] == 1:
             cursor.execute('SELECT * FROM nurses WHERE nurseusername=%s', (session['username'],))
             nurse_info = cursor.fetchone()
-            render_template('nurse_profile_view.html', user_info=user_info, nurse_info=nurse_info)
+            render_template('nurse_views/nurse_profile_view.html', user_info=user_info, nurse_info=nurse_info)
         elif user_type['UserTypeID'] == 2:
             cursor.execute('SELECT * FROM patients WHERE PatientSUserName=%s', (session['username'],))
             patient_info = cursor.fetchone()
@@ -107,7 +107,7 @@ def profile():
         elif user_type['UserTypeID'] == 3:
             cursor.execute('SELECT * FROM physicians WHERE PhysicianUserName=%s', (session['username'],))
             physician_info = cursor.fetchone()
-            render_template('physician_view.html', user_info=user_info, physician_info=physician_info)
+            render_template('physician_views/physician_view.html', user_info=user_info, physician_info=physician_info)
         elif user_type['UserTypeID'] == 4:
             cursor.execute('SELECT * FROM admins WHERE AdminUserName=%s', (session['username'],))
             admin_info = cursor.fetchone()
@@ -116,7 +116,7 @@ def profile():
             cursor.execute('SELECT * FROM staff WHERE StaffUserName=%s', (session['username'],))
             staff_info = cursor.fetchone()
             render_template('staff_view.html', user_info=user_info, staff_info=staff_info)
-    return redirect(url_for('login'))
+        else:    return redirect(url_for('login'))
 
     
 @app.route('/after_visit_summary')
@@ -183,10 +183,7 @@ def new_user_view():
 @app.route('/patient')
 def patient():
     if 'loggedin' in session:
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('CALL GetPatientInsuranceInfo(%s)', (session['username'],))
-        insurance = cursor.fetchone()
-        return render_template('patient_views/patient_view.html', insurance=insurance)
+        return render_template('patient_views/patient_view.html')
     return redirect(url_for('login'))
 
 @app.route('/edit_insurance', methods=['GET', 'POST'])
@@ -209,6 +206,15 @@ def edit_insurance():
             return redirect(url_for('patient'))
 
         return render_template('patient_views/edit_insurance.html', insurance_list=insurance_list)
+    return redirect(url_for('login'))
+
+@app.route('/patient_insurance')
+def patient_insurance():
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('CALL GetPatientInsuranceInfo(%s)', (session['username'],))
+        insurance = cursor.fetchone()
+        return render_template('patient_views/patient_insurance.html', insurance=insurance)
     return redirect(url_for('login'))
 
 @app.route('/schedule_appointment', methods=['GET', 'POST'])
@@ -289,7 +295,32 @@ def nurse():
 @app.route('/physician')
 def physician():
     if 'loggedin' in session:
-        return render_template('physician_views/physician_view.html')
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT UserID FROM usernames WHERE UserName = %s', (session['username'],))
+        user_id = cursor.fetchone()
+        cursor.execute('SELECT * FROM physicians WHERE PhysicianUserName = %s', (session['username'],))
+        physician_info = cursor.fetchone()
+        specialty_id = physician_info['PhysicianSpecialtiesID']
+        cursor.execute('SELECT SpecialtyDesc FROM physicianspecialties WHERE PhysicianSpecialtiesID = %s', (specialty_id,))
+        specialty_info = cursor.fetchone()
+        if specialty_info:
+            physician_info['SpecialtyDesc'] = specialty_info['SpecialtyDesc']
+        type_id = physician_info['PhysicianTypeID']
+        cursor.execute('SELECT PhysicianTypeDesc FROM physiciantypes WHERE PhysicianTypeID = %s', (type_id,))
+        type_info = cursor.fetchone()
+        if type_info:
+            physician_info['PhysicianTypeDesc'] = type_info['PhysicianTypeDesc']
+        dept_id = physician_info['DepartmentID']
+        cursor.execute('SELECT DepartmentName FROM departments WHERE DepartmentID = %s', (dept_id,))
+        dept_info = cursor.fetchone()
+        if dept_info:
+            physician_info['DepartmentName'] = dept_info['DepartmentName']
+        cursor.execute('SELECT UserID FROM usernames WHERE UserName = %s', (session['username'],))
+        user_id_result = cursor.fetchone()
+        user_id = user_id_result['UserID']
+        cursor.execute('SELECT * FROM users WHERE UserID = %s', (user_id,))
+        user_info = cursor.fetchone()
+        return render_template('physician_views/physician_view.html', physician_info=physician_info, user_info=user_info)
     return redirect(url_for('login'))
 
 @app.route('/admin')
@@ -301,12 +332,60 @@ def admin():
 @app.route('/staff')
 def staff():
     if 'loggedin' in session:
-        return render_template('staff_views/staff_view.html')
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM staff WHERE StaffUserName = %s', (session['username'],))
+        staff_info = cursor.fetchone()
+        cursor.execute('SELECT UserID FROM usernames WHERE UserName = %s', (session['username'],))
+        user_id_result = cursor.fetchone()
+        user_id = user_id_result['UserID']
+        cursor.execute('SELECT * FROM users WHERE UserID = %s', (user_id,))
+        user_info = cursor.fetchone()
+        return render_template('staff_views/staff_view.html', staff_info=staff_info, user_info=user_info)
     return redirect(url_for('login'))   
 
 @app.route('/user_profile')
 def user_profile():
-    return render_template('user_profile.html')
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT UserID FROM usernames WHERE UserName = %s', (session['username'],))
+        user_id_result = cursor.fetchone()
+        user_id = user_id_result['UserID']
+        cursor.execute('SELECT * FROM users WHERE UserID = %s', (user_id,))
+        user_info = cursor.fetchone()
+        cursor.execute('SELECT UserTypeID FROM usernames WHERE UserName = %s', (session['username'],))
+        user_type = cursor.fetchone()
+        if user_type['UserTypeID'] == 1:
+            cursor.execute('SELECT * FROM nurses WHERE nurseusername=%s', (session['username'],))
+            nurse_info = cursor.fetchone()
+            return render_template('nurse_views/nurse_profile_view.html', user_info=user_info, nurse_info=nurse_info)
+        elif user_type['UserTypeID'] == 2:
+            cursor.execute('SELECT * FROM patients WHERE PatientUserName=%s', (session['username'],))
+            patient_info = cursor.fetchone()
+            return render_template('patient_views/patient_profile_view.html', user_info=user_info, patient_info=patient_info)
+        elif user_type['UserTypeID'] == 3:
+            cursor.execute('SELECT * FROM physicians WHERE PhysicianUserName=%s', (session['username'],))
+            physician_info = cursor.fetchone()
+            return render_template('physician_views/physician_profile_view.html', user_info=user_info, physician_info=physician_info)
+        elif user_type['UserTypeID'] == 4:
+            cursor.execute('SELECT * FROM admins WHERE AdminUserName=%s', (session['username'],))
+            admin_info = cursor.fetchone()
+            dept_id = admin_info['DepartmentID']
+            cursor.execute('SELECT DepartmentName FROM departments WHERE DepartmentID = %s', (dept_id,))
+            dept_info = cursor.fetchone()
+            if dept_info:
+                admin_info['DepartmentName'] = dept_info['DepartmentName']
+            return render_template('admin_views/admin_profile_view.html', user_info=user_info, admin_info=admin_info)
+        elif user_type['UserTypeID'] == 5:
+            cursor.execute('SELECT * FROM staff WHERE StaffUserName=%s', (session['username'],))
+            staff_info = cursor.fetchone()
+            clinic_id = staff_info['ClinicID']
+            cursor.execute('SELECT ClinicName FROM clinics WHERE ClinicID = %s', (clinic_id,))
+            clinic_info = cursor.fetchone()
+            if clinic_info:
+                staff_info['ClinicName'] = clinic_info['ClinicName']
+            return render_template('staff_views/staff_profile_view.html', user_info=user_info, staff_info=staff_info)
+        
+        return redirect(url_for('login'))
 
 
 @app.route('/physician_patients')

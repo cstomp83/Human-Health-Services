@@ -6,19 +6,15 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css')}}" />
     </head>
     <body>
-        <h1 class="word">Welcome, Patient {{ session.username }}! </h1>
+        <h1 class="word">Welcome, Staff {{ session.username }}! </h1>
         <div class="navbar">
-            <a href="{{url_for('patient')}}" class="navbar-brand">Home</a> 
+            <a href="{{url_for('staff')}}" class="navbar-brand">Home</a> 
             <a href="{{ url_for('user_profile') }}" class="navbar-item">Profile</a>
-            <a href="{{ url_for('after_visit_summary') }}" class="navbar-item">After Visit Summaries</a>
-            <a href="{{ url_for('patient_billing') }}" class="navbar-item">Billing</a>
-            <a href="{{ url_for('schedule_appointment') }}" class="navbar-item">Schedule Appointment</a>
-            <a href="{{ url_for('patient_insurance') }}" class="navbar-item">Insurance</a>
             <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
         </div>
         <div class="body-content">
             <h2>User Information</h2>
-            <div class="info"><span class="label">Username: </span>{{ patient_info.PatientUserName }}</div>
+            <div class="info"><span class="label">Username: </span>{{ staff_info.StaffUserName }}</div>
             <div class="info"><span class="label">User ID: </span>{{ user_info.UserID }}</div>
             <div class="info"><span class="label">First Name: </span>{{ user_info.FirstName }}</div>
             <div class="info"><span class="label">Middle Name: </span>{{ user_info.MiddleName }}</div>
@@ -30,8 +26,8 @@
             <div class="info"><span class="label">State: </span>{{ user_info.State }}</div>
             <div class="info"><span class="label">Zip Code: </span>{{ user_info.Zip }}</div>
             <div class="info"><span class="label">Phone Number: </span>{{ user_info.Phone }}</div>
-            <div class="info"><span class="label">Insurance ID: </span>{{ patient_info.InsuranceID }}</div>
-            <div class="info"><span class="label">Bed ID: </span>{{ patient_info.BedID }}</div>
+            <div class="info"><span class="label">Rank: </span>{{ staff_info.Rank }}</div>
+            <div class="info"><span class="label">Clinic: </span>{{ staff_info.ClinicName }}</div>
         <div class="body-content">
             <footer>
                 <p class="word"></p>

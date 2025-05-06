@@ -9,7 +9,7 @@
     <h1 class="word">Welcome, {{ session['username'] }}!</h1>
 
     <div class="navbar">
-        <a href="{{ url_for('profile') }}" class="navbar-item">Profile</a>
+        <a href="{{ url_for('user_profile') }}" class="navbar-item">Profile</a>
         <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
     </div>
 

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css')}}" />
+    </head>
+    <body>
+        <h1 class="word">Welcome, Physician {{ session.username }}! </h1>
+        <div class="navbar">
+            <a href="{{url_for('physician')}}" class="navbar-brand">Home</a> 
+            <a href="{{ url_for('user_profile') }}" class="navbar-item">Profile</a>
+            <a href="{{ url_for('physician_patients') }}" class="navbar-item">Patients</a>
+            <a href="{{ url_for('physician_lab_test_orders') }}" class="navbar-item">Lab Test Orders</a>
+            <a href="{{ url_for('user_detail_notes') }}" class="navbar-item">Detailed Notes</a>
+            <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
+        </div>
+        <div class="body-content">
+            <h2>User Information</h2>
+            <div class="info"><span class="label">Username:</span>{{ physician_info.PhysicianUserName }}</div>
+            <div class="info"><span class="label">User ID:</span>{{ user_info.UserID }}</div>
+            <div class="info"><span class="label">First Name:</span>{{ user_info.FirstName }}</div>
+            <div class="info"><span class="label">Middle Name:</span>{{ user_info.MiddleName }}</div>
+            <div class="info"><span class="label">Last Name:</span>{{ user_info.LastName }}</div>
+            <div class="info"><span class="label">Date of Birth:</span>{{ user_info.DOB }}</div>
+            <div class="info"><span class="label">SSN:</span>{{ user_info.ssn }}</div>
+            <div class="info"><span class="label">Address:</span>{{ user_info.Address1 }}</div>
+            <div class="info"><span class="label">City:</span>{{ user_info.City }}</div>
+            <div class="info"><span class="label">State:</span>{{ user_info.State }}</div>
+            <div class="info"><span class="label">Zip Code:</span>{{ user_info.Zip }}</div>
+            <div class="info"><span class="label">Phone Number:</span>{{ user_info.Phone }}</div>
+            <div class="info"><span class="label">Specialties:</span>{{ physician_info.SpecialtyDesc }}</div>
+            <div class="info"><span class="label">Type:</span>{{ physician_info.PhysicianTypeDesc }}</div>
+            <div class="info"><span class="label">NPI:</span>{{ physician_info.NPI }}</div>
+            <div class="info"><span class="label">Rank:</span>{{ physician_info.Rank }}</div>
+            <div class="info"><span class="label">Department:</span>{{ physician_info.DepartmentName }}</div>
+            <footer>
+                <p class="word"></p>
+            </footer>
+        </div>
+    </body>
+</html>

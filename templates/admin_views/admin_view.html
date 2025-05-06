@@ -7,11 +7,16 @@
     <title>Dashboard</title>
 </head>
 <body>
-
+    <div class="navbar" style="background: lightgray; height: 50px;">
+        <a href="{{ url_for('admin') }}" class="navbar-brand">Home</a>
+        <a href="{{ url_for('user_profile') }}" class="navbar-item">Profile</a>
+        <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
+    </div>
+    
     <div class="header">
         <h1 class="word">Welcome, Admin {{ session.username }}!</h1>
     </div>
-
+    
     <div class="border">
         <p class="word">You are now logged in.</p>
         <a class="btn" href="{{ url_for('logout') }}">Logout</a>
