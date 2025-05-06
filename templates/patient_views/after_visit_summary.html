@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css')}}" />
+    </head>
+    <body>
+        <h1 class="word">Welcome, Patient {{ session.username }}! </h1>
+        <div class="navbar">
+            <a href="{{url_for('patient')}}" class="navbar-brand">Home</a> 
+            <a href="{{ url_for('after_visit_summary') }}" class="navbar-item">After Visit Summaries</a>
+            <a href="{{ url_for('user_profile') }}" class="navbar-item">Profile</a>
+            <a href="{{ url_for('patient_billing') }}" class="navbar-item">Billing</a>
+            <a href="{{ url_for('schedule_appointment') }}" class="navbar-item">Schedule Appointment</a>
+            <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
+        </div>
+        <h2>After Visit Summary</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Clinic Name</th>
+                    <th>Record Description</th>
+                    <th>Conidtions</th>
+                    <th>Medications</th>
+                    <th>Dosage</th>
+                    <th>Dose</th>
+                    <th>Lab Tests</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for vs in visit_summary %}
+                <tr>
+                    <td>{{ vs.ClinicName }}</td>
+                    <td>{{ vs.RecordDesc }}</td>
+                    <td>{{ vs.Conditions }}</td>
+                    <td>{{ vs.MedicationName }}</td>
+                    <td>{{ vs.Dosage }}</td>
+                    <td>{{ vs.Dose }}</td>
+                    <td>{{ vs.LabTests }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        <div class="body-content">
+            <footer>
+                <p class="word"></p>
+            </footer>
+        </div>
+    </body>
+</html>

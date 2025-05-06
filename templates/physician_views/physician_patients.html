@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Physician Patients</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css')}}" />
+</head>
+<body>
+    <h1 class="word">Welcome, Physician {{ session['username'] }}! </h1>
+
+    <div class="navbar">
+        <a href="{{url_for('physician')}}" class="navbar-brand">Home</a> 
+        <a href="{{url_for('physician')}}" class="navbar-brand">Home</a> 
+        <a href="{{ url_for('physician_patients') }}" class="navbar-item">Patients</a>
+        <a href="{{ url_for('profile') }}" class="navbar-item">Profile</a>
+        <a href="{{ url_for('physician_lab_test_orders') }}" class="navbar-item">Lab Test Orders</a>
+        <a href="{{ url_for('user_detail_notes') }}" class="navbar-item">Detailed Notes</a>
+        <a href="{{ url_for('physician_patient_records') }}" class="navbar-item">Medical Records</a>
+        <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
+    </div>
+
+    <div class="body-content">
+        <h2>Patients</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Date of Birth</th>
+                    <th>Medical Records</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td>{{ patient.FirstName }}</td>
+                    <td>{{ patient.LastName }}</td>
+                    <td>{{ patient.DOB }}</td>
+                    <td>
+                        <a href="#" onclick="loadMedicalRecords('{{ patient.UserName }}'); return false;">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal for Medical Records -->
+    <div id="medicalRecordsModal" style="display:none; position:fixed; top:10%; left:20%; width:60%; background:white; border:1px solid #ccc; padding:20px; z-index:1000;">
+        <span onclick="closeModal()" style="float:right; cursor:pointer; font-size:18px;">&times;</span>
+        <h3>Medical Records</h3>
+        <div id="modalContent">Loading...</div>
+    </div>
+
+    <footer>
+        <p class="word"></p>
+    </footer>
+
+    <!-- Load external JS at end of body -->
+    <script src="{{ url_for('static', filename='js/medical_records.js') }}"></script>
+</body>
+</html>
