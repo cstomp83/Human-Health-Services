@@ -99,23 +99,23 @@ def profile():
         if user_type['UserTypeID'] == 1:
             cursor.execute('SELECT * FROM nurses WHERE nurseusername=%s', (session['username'],))
             nurse_info = cursor.fetchone()
-            render_template('nurse_profile_view.html', user_info=user_info, nurse_info=nurse_info)
+            return render_template('nurse_profile_view.html', user_info=user_info, nurse_info=nurse_info)
         elif user_type['UserTypeID'] == 2:
             cursor.execute('SELECT * FROM patients WHERE PatientSUserName=%s', (session['username'],))
             patient_info = cursor.fetchone()
-            render_template('patient_profile_view.html', user_info=user_info, patient_info=patient_info)
+            return render_template('patient_profile_view.html', user_info=user_info, patient_info=patient_info)
         elif user_type['UserTypeID'] == 3:
             cursor.execute('SELECT * FROM physicians WHERE PhysicianUserName=%s', (session['username'],))
             physician_info = cursor.fetchone()
-            render_template('physician_view.html', user_info=user_info, physician_info=physician_info)
+            return render_template('physician_view.html', user_info=user_info, physician_info=physician_info)
         elif user_type['UserTypeID'] == 4:
             cursor.execute('SELECT * FROM admins WHERE AdminUserName=%s', (session['username'],))
             admin_info = cursor.fetchone()
-            render_template('admin_profile_view.html', user_info=user_info, admin_info=admin_info)
+            return render_template('admin_profile_view.html', user_info=user_info, admin_info=admin_info)
         elif user_type['UserTypeID'] == 5:
             cursor.execute('SELECT * FROM staff WHERE StaffUserName=%s', (session['username'],))
             staff_info = cursor.fetchone()
-            render_template('staff_view.html', user_info=user_info, staff_info=staff_info)
+            return render_template('staff_view.html', user_info=user_info, staff_info=staff_info)
     return redirect(url_for('login'))
 #Carley Youngquist
 #Connor Stomp   
