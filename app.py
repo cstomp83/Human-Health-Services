@@ -17,7 +17,7 @@ app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
 app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
 mysql = MySQL(app)
-
+# Carley Youngquist 
 @app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -46,14 +46,14 @@ def login():
         else:
             msg = 'Failed login!'
     return render_template('login.html', msg=msg)
-
+#Carley Youngquist
 @app.route('/logout')
 def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
     return redirect(url_for('login'))
-
+#Carley Youngquist
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     msg = ''
@@ -87,7 +87,7 @@ def register():
         else:
             return redirect(url_for('new_user_view'))
     return render_template('register.html', msg=msg)
-
+#Carley Youngquist
 @app.route('/profile')
 def profile():
     if 'loggedin' in session:
@@ -117,8 +117,8 @@ def profile():
             staff_info = cursor.fetchone()
             render_template('staff_view.html', user_info=user_info, staff_info=staff_info)
     return redirect(url_for('login'))
-
-    
+#Carley Youngquist
+#Connor Stomp   
 @app.route('/after_visit_summary')
 def after_visit_summary():
     if 'loggedin' in session:
@@ -128,7 +128,7 @@ def after_visit_summary():
         visit_summary = cursor.fetchall()
         return render_template('patient_views/after_visit_summary.html', visit_summary=visit_summary)
     return render_template('patient_views/after_visit_summary.html')
-
+#Carley Youngquist
 @app.route('/new_user_view', methods=['GET', 'POST'])
 def new_user_view():
     msg = ''
@@ -185,7 +185,7 @@ def new_user_view():
 
         return render_template('login.html', msg=msg)
     return render_template('new_user_view.html', msg=msg)
-
+#Carley Youngquist
 @app.route('/patient')
 def patient():
     if 'loggedin' in session:
@@ -194,7 +194,7 @@ def patient():
         insurance = cursor.fetchone()
         return render_template('patient_views/patient_view.html', insurance=insurance)
     return redirect(url_for('login'))
-
+#Connor Stomp
 @app.route('/edit_insurance', methods=['GET', 'POST'])
 def edit_insurance():
     if 'loggedin' in session:
@@ -216,7 +216,7 @@ def edit_insurance():
 
         return render_template('patient_views/edit_insurance.html', insurance_list=insurance_list)
     return redirect(url_for('login'))
-
+#Connor Stomp
 @app.route('/schedule_appointment', methods=['GET', 'POST'])
 def schedule_appointment():
     if 'loggedin' not in session:
@@ -266,7 +266,7 @@ def schedule_appointment():
     return render_template('patient_views/schedule_appointment.html', appt_types=appt_types, schedule_types=schedule_types, clinics=clinics, physicians=physicians,appointments=appointments)
 
 
-
+#Connor Stomp
 @app.route('/patient_views/patient_billing')
 def patient_billing():
     if 'loggedin' in session:
@@ -275,7 +275,7 @@ def patient_billing():
         billing_info = cursor.fetchall()
         return render_template('patient_views/patient_billing.html', billing_info=billing_info)
     return redirect(url_for('login'))
-
+#Connor Stomp
 @app.route('/pay_bill', methods=['POST'])
 def pay_bill():
     if 'loggedin' in session and 'billing_id' in request.form:
@@ -284,8 +284,7 @@ def pay_bill():
         cursor.execute('DELETE FROM Billing WHERE BillingID = %s AND PatientUserName = %s', (billing_id, session['username']))
         mysql.connection.commit()
     return redirect(url_for('patient_billing'))
-
-
+#Fiza 
 @app.route('/nurse')
 def nurse():
     if 'loggedin' in session:
@@ -294,7 +293,7 @@ def nurse():
         notes = cursor.fetchall()
         return render_template('nurse_views/nurse_view.html', notes=notes)
     return redirect(url_for('login'))
-
+#Fiza
 @app.route('/update_notes', methods=['POST'])
 def update_notes():
     if 'loggedin' in session and 'detail_note_id' in request.form and 'note_desc' in request.form:
@@ -304,13 +303,13 @@ def update_notes():
         cursor.execute('UPDATE detailNotes SET NotesDesc = %s WHERE DetailNoteID = %s', (notes_desc, notes_id))
         mysql.connection.commit()
     return redirect(url_for('nurse'))
-
+#Connor Stomp
 @app.route('/physician')
 def physician():
     if 'loggedin' in session:
         return render_template('physician_views/physician_view.html')
     return redirect(url_for('login'))
-
+#Connnor Stomp
 @app.route('/physician_patient_records')
 def physician_patient_records():
     if 'loggedin' in session:
@@ -319,7 +318,7 @@ def physician_patient_records():
         medical_records = cursor.fetchall()
         return render_template('physician_views/physician_patient_records.html', medical_records=medical_records)
     return redirect(url_for('login'))
-
+#Fiza
 @app.route('/update_medical_record', methods=['POST'])
 def update_medical_record():
     if 'loggedin' in session and 'record_id' in request.form and 'record_desc' in request.form:
@@ -330,13 +329,13 @@ def update_medical_record():
         cursor.execute('UPDATE PatientMedicalRecords SET RecordDesc = %s, Conditions = %s WHERE PatientMedicalRecordsID = %s',(record_desc, conditions, record_id))
         mysql.connection.commit()
     return redirect(url_for('physician_patient_records'))
-
+#Carley Youngquist
 @app.route('/admin')
 def admin():
     if 'loggedin' in session:
         return render_template('admin_views/admin_view.html')
     return redirect(url_for('login'))
-
+#Connnor Stomp
 @app.route('/staff')
 def staff():
     if 'loggedin' in session:
@@ -349,7 +348,7 @@ def staff():
         nurses = cursor.fetchall()
         return render_template('staff_views/staff_view.html', appointments=appointments, nurses=nurses)
     return redirect(url_for('login'))
-
+#Connor Stomp
 @app.route('/assign_nurse', methods=['POST'])
 def assign_nurse():
     if 'loggedin' in session and 'nurse_username' in request.form and 'appointment_id' in request.form:
@@ -370,12 +369,12 @@ def assign_nurse():
         mysql.connection.commit()
     return redirect(url_for('staff'))
    
-
+#Connor Stomp
 @app.route('/user_profile')
 def user_profile():
     return render_template('user_profile.html')
 
-
+#Fiza
 @app.route('/physician_patients')
 def physician_patients():
     if 'loggedin' in session:
@@ -384,7 +383,7 @@ def physician_patients():
         patients = cursor.fetchall()
         return render_template('physician_views/physician_patients.html', patients=patients)
     return redirect(url_for('login'))
-
+#Connor Stomp
 @app.route('/get_medical_records/<username>')
 def get_medical_records(username):
     if 'loggedin' in session:
@@ -416,13 +415,13 @@ def get_medical_records(username):
         html += '</ul>'
         return html
     return "Unauthorized", 401
-
+#Fiza
 @app.route('/user_detail_notes')
 def user_detail_notes():
     if 'loggedin' in session:
         return render_template('detailed_notes_view.html', username=session['username'])
     return redirect(url_for('login'))
-
+#Connor Stomp
 @app.route('/api/user_detail_notes/<username>')
 def get_user_detail_notes(username):
     if 'loggedin' in session:
@@ -447,7 +446,7 @@ def get_user_detail_notes(username):
         html += "</ul>"
         return html
     return "Unauthorized", 401
-
+#Connor Stomp
 @app.route('/physician_lab_test_orders', methods=['GET', 'POST'])
 def physician_lab_test_orders():
     if 'loggedin' in session:
