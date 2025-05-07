@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
 <html>
     <head>
         <meta charset="utf-8" />
@@ -14,7 +13,6 @@
             <a href="{{ url_for('user_profile') }}" class="navbar-item">Profile</a>
             <a href="{{ url_for('patient_billing') }}" class="navbar-item">Billing</a>
             <a href="{{ url_for('schedule_appointment') }}" class="navbar-item">Schedule Appointment</a>
-            <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
         </div>
         <div class="body-content">
             <h2>Insurance Information</h2>
@@ -53,33 +51,3 @@
         </div>
     </body>
 </html>
-=======
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-    <title>Dashboard</title>
-</head>
-<body>
-    <div class="navbar" style="background: lightgray; height: 50px;">
-        <a href="{{ url_for('patient') }}" class="navbar-brand">Home</a>
-        <a href="{{ url_for('user_profile') }}" class="navbar-item">Profile</a>
-        <a href="{{ url_for('after_visit_summary') }}" class="navbar-item">After Visit Summary</a>
-        <a href="{{ url_for('patient_billing') }}" class="navbar-item">Billing</a>
-        <a href="{{ url_for('schedule_appointment') }}" class="navbar-item">Schedule Appointment</a>
-        <a href="{{ url_for('patient_insurance') }}" class="navbar-item">Insurance</a>
-    </div>
-    
-    <div class="header">
-        <h1 class="word">Welcome, Patient {{ session.username }}!</h1>
-    </div>
-    
-    <div class="border">
-        <p class="word">You are now logged in.</p>
-        <a class="btn" href="{{ url_for('logout') }}">Logout</a>
-    </div>
-
-</body>
-</html>
->>>>>>> carley

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html>
     <head>
         <meta charset="utf-8" />
@@ -47,3 +48,30 @@
         </div>
     </body>
 </html>
+=======
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Dashboard</title>
+</head>
+<body>
+    <div class="navbar" style="background: lightgray; height: 50px;">
+        <a href="{{ url_for('nurse') }}" class="navbar-brand">Home</a>
+        <a href="{{ url_for('user_profile') }}" class="navbar-item">Profile</a>
+        <a href="{{ url_for('user_detail_notes') }}" class="navbar-item">Detailed Notes</a>
+    </div>
+    
+    <div class="header">
+        <h1 class="word">Welcome, Nurse {{ session.username }}!</h1>
+    </div>
+    
+    <div class="border">
+        <p class="word">You are now logged in.</p>
+        <a class="btn" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+
+</body>
+</html>
+>>>>>>> carley

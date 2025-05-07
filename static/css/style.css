@@ -1,5 +1,6 @@
 /* General styling */
 body {
+    padding-top: 60px;
     font-family: Arial, sans-serif;
     background-color: #9AC0CD;
     display: flex;
@@ -99,4 +100,29 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+.navbar {
+    width: 100%;
+    background-color: #236B8E;
+    overflow: hidden;
+    position: fixed; /* Sticks to top */
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Makes sure it stays above other elements */
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.navbar a {
+    color: white;
+    padding: 14px 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar a:hover {
+    background-color: #1E5A7B;
+    color: #fff;
 }
